@@ -4,19 +4,24 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using System.Collections.Concurrent;
 
 namespace DataManipulator
 {
     public class Reader
     {
-        public Reader(string dataFolder)
+        public Reader(string rootFolder)
         {
-            DataFolder = dataFolder;
-
+            RootFolder = rootFolder;
+            TrainingFiles = Directory.GetFiles(TrainingFolder);
         }
 
-        public string DataFolder { get; private set; }
+        public string RootFolder { get; private set; }
+        public string DataFolder { get { return RootFolder + "/netflix"; } }
         public string TrainingFolder { get { return DataFolder + "/training"; } }
+        public string[] TrainingFiles { get; private set; }
+        public string CreatedProbeFile { get { return RootFolder + "/createdprobe.txt"; } }
 
         /// <summary>
         /// Returns [movie, [user, rating]]
@@ -56,18 +61,17 @@ namespace DataManipulator
         /// <returns></returns>
         public Dictionary<int, Dictionary<int, int>> ReadSeveralTrainingFiles(int n)
         {
-            var filePaths = Directory.GetFiles(TrainingFolder);
-            if (n > filePaths.Length)
-            {
-                n = filePaths.Length;
-            }
+            int i = 0;
 
             var values = new Dictionary<int, Dictionary<int, int>>(n);
+            var filesToRead = TrainingFiles.Take(n).ToList();
 
-            for (int i = 0; i < n; i++)
+            foreach (var file in filesToRead)
             {
-                var value = ReadTrainingFile(filePaths[i]);
+                if (i % 100 == 0) { Debug.WriteLine(i); }
+                var value = ReadTrainingFile(file);
                 values.Add(value.Item1, value.Item2);
+                i++;
             }
 
             return values;
@@ -92,7 +96,7 @@ namespace DataManipulator
         /// Returns [movie, [users]]
         /// </summary>
         /// <returns></returns>
-        public Dictionary<int, List<int>> ReadProbe()
+        public Dictionary<int, List<int>> ReadProbeFile()
         {
             var probes = new Dictionary<int, List<int>>();
 
@@ -118,81 +122,61 @@ namespace DataManipulator
             return probes;
         }
 
-        /// <summary>
-        /// Returns [movie, user]
-        /// </summary>
-        /// <param name="probes"></param>
-        /// <returns></returns>
-        public Dictionary<Tuple<int, int>, int> ProbesToPairs(Dictionary<int, List<int>> probes, IEnumerable<int> users)
-        {
-            int n = probes.Select(p => p.Value.Count).Sum();
-            var pairs = new Dictionary<Tuple<int, int>, int>(n);
 
-            foreach (var probe in probes)
+        //public Dictionary<int, List<Tuple<int, int>>> ReadUsersRatingsFromCreatedProbeFile()
+        //{
+
+        //}
+
+        public void CalcAndSaveUsersRatings()
+        {
+            var probes = ReadProbeFile();
+            var output = new ConcurrentBag<string>();
+
+            Parallel.ForEach(probes.Take(100000), probe =>
             {
-                foreach (var user in probe.Value)
+                output.Add(CalcAndSaveUsersRatingsHelper(probe));
+            });
+
+            if (File.Exists(CreatedProbeFile))
+            {
+                File.Delete(CreatedProbeFile);
+            }
+            using (StreamWriter writer = new StreamWriter(CreatedProbeFile))
+            {
+                foreach (var line in output)
                 {
-                    if (users.Contains(user))
-                    {
-                        pairs.Add(new Tuple<int, int>(probe.Key, user), -1);
-                    }
+                    writer.WriteLine(line);
                 }
             }
-
-            return pairs;
         }
 
-        public Dictionary<Tuple<int, int>, int> ReadProbesAsPair(IEnumerable<int> movies, IEnumerable<int> users)
+        private string CalcAndSaveUsersRatingsHelper(KeyValuePair<int, List<int>> probe)
         {
-            int i = 0;
-            var pairs = new Dictionary<Tuple<int, int>, int>();
+            int movie = probe.Key;
+            StringBuilder movieUsersRatings = new StringBuilder(movie.ToString() + ":" + Environment.NewLine);
+            var usersWatched = probe.Value;
+            var trainingFile = TrainingFolder + "/mv_" + movie.ToString().PadLeft(7, '0') + ".txt";
 
-            using (StreamReader reader = new StreamReader(DataFolder + "/probe.txt"))
+            var ratingsFromFile = ReadTrainingFile(trainingFile);
+            if (ratingsFromFile.Item1 != movie)
             {
-                var colonTrim = new char[] { ':' };
-                var line = reader.ReadLine();
-                i++;
-                var ind = line.TrimEnd(colonTrim);
-                int movie = int.Parse(ind);
-                line = reader.ReadLine();
-                i++;
-
-                while (!reader.EndOfStream)
-                {
-                    Debug.WriteLine("i: " + i++);
-                    if (!movies.Contains(movie))
-                    {
-                        line = reader.ReadLine();
-                        while (!line.Contains(':') && !reader.EndOfStream)
-                        {
-                            line = reader.ReadLine();
-                            i++;
-                        }
-                        ind = line.TrimEnd(colonTrim);
-                        movie = int.Parse(ind);
-                        line = reader.ReadLine();
-                        i++;
-                    }
-                    else
-                    {
-                        while (!line.Contains(':') && !reader.EndOfStream)
-                        {
-                            int user = int.Parse(line);
-
-                            if (users.Contains(user))
-                            {
-                                pairs.Add(new Tuple<int, int>(movie, user), -1);
-                            }
-
-                            line = reader.ReadLine();
-                            i++;
-                        }
-                        movie = -1;
-                    }
-                }
+                throw new Exception();
             }
 
-            return pairs;
+            foreach (var userWithRating in ratingsFromFile.Item2)
+            {
+                if (probe.Value.Contains(userWithRating.Key))
+                {
+                    movieUsersRatings.Append(userWithRating.Key + "," + userWithRating.Value + Environment.NewLine);
+                }
+                //else
+                //{
+                //    movieUsersRatings.Append(userWithRating.Key + ",-1" + Environment.NewLine);
+                //}
+            }
+
+            return movieUsersRatings.ToString();
         }
     }
 }

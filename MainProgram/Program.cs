@@ -11,38 +11,28 @@ namespace MainProgram
     {
         static void Main(string[] args)
         {
-            Reader reader = new Reader(@"../../../netflix");
+            Reader reader = new Reader(@"../../..");
 
-            var tf = reader.ReadSeveralTrainingFiles(1100);
-
-            var trainingFiles = new Dictionary<int, Dictionary<int, int>>();
-
-            //trainingFiles = tf.Take(10);
-            //trainingFiles = trainingFiles.Union(tf.Skip(989).Take(10));
-
-            foreach (var item in tf.Take(10))
-            {
-                trainingFiles.Add(item.Key, item.Value);
-            }
-
-            foreach (var item in tf.Skip(995).Take(10))
-            {
-                trainingFiles.Add(item.Key, item.Value);
-            }
-
-
-            var trainingUsers = DistinctUsers(trainingFiles);
-            var trainingMovies = trainingFiles.Keys.ToList();
-
-
+            //var trainingFiles = reader.ReadSeveralTrainingFiles(200000);
+                        
             // using probes and training data:
             // create a new probe file, with <movie, user, score>
 
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+            reader.CalcAndSaveUsersRatings();
+            watch.Stop();
+            Console.WriteLine(watch.Elapsed);
 
-            var movies = reader.ReadMovies();
+            Console.ReadKey();
+
+            //var probes = reader.ReadProbeFile();
+
+
+            //var movies = reader.ReadMovies();
             //var probes = reader.ReadProbe();
             //var pairs = reader.ProbesToPairs(probes, allUsers);
-            var pairs = reader.ReadProbesAsPair(trainingMovies, trainingUsers);
+            //var pairs = reader.ReadProbesAsPair(trainingMovies, trainingUsers);
         }
 
         private static IEnumerable<int> DistinctUsers(Dictionary<int, Dictionary<int, int>> trainingFiles)
