@@ -61,5 +61,46 @@ namespace DataManipulator
 
             return values;
         }
+
+        public List<Movie> ReadMovies()
+        {
+            var movies = new List<Movie>(17771);
+
+            using (StreamReader reader = new StreamReader(DataFolder + "/movie_titles.txt"))
+            {
+                while (!reader.EndOfStream)
+                {
+                    movies.Add(new Movie(reader.ReadLine()));
+                }
+            }
+
+            return movies;
+        }
+
+        public Dictionary<int, List<int>> ReadProbe()
+        {
+            var probes = new Dictionary<int, List<int>>();
+
+            using (StreamReader reader = new StreamReader(DataFolder + "/probe.txt"))
+            {
+                int index = 0;
+                while (!reader.EndOfStream)
+                {
+                    var line = reader.ReadLine();
+
+                    if (line.Contains(':'))
+                    {
+                        var ind = line.TrimEnd(new char[] { ':' });
+                        index = int.Parse(ind);
+                        probes[index] = new List<int>();
+                        line = reader.ReadLine();
+                    }
+
+                    probes[index].Add(int.Parse(line));
+                }
+            }
+
+            return probes;
+        }
     }
 }

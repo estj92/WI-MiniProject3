@@ -13,6 +13,8 @@ namespace MainProgram
             Reader reader = new Reader(@"../../../netflix");
 
             var files = reader.ReadSeveralTrainingFiles(10);
+            var movies = reader.ReadMovies();
+            var probes = reader.ReadProbe();
         }
     }
 }
