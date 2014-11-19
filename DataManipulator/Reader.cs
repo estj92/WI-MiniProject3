@@ -8,12 +8,14 @@ namespace DataManipulator
 {
     public class Reader
     {
-        public Reader(string trainingFilesFolderPath)
+        public Reader(string dataFolder)
         {
-            TrainingFilesFolderPath = trainingFilesFolderPath;
+            DataFolder = dataFolder;
+
         }
 
-        public string TrainingFilesFolderPath { get; private set; }
+        public string DataFolder { get; private set; }
+        public string TrainingFolder { get { return DataFolder + "/training"; } }
 
         public Tuple<int, Dictionary<int, int>> ReadTrainingFile(string file)
         {
@@ -22,7 +24,10 @@ namespace DataManipulator
 
             using (StreamReader reader = new StreamReader(file))
             {
-                index = int.Parse(reader.ReadLine().Split(new char[] { ':' })[0]);
+                //index = int.Parse(reader.ReadLine().Split(new char[] { ':' })[0]);
+                string first = reader.ReadLine();
+                var val = first.TrimEnd(new char[] { ':' });
+                index = int.Parse(val);
 
                 while (!reader.EndOfStream)
                 {
@@ -40,7 +45,7 @@ namespace DataManipulator
 
         public Dictionary<int, Dictionary<int, int>> ReadSeveralTrainingFiles(int n)
         {
-            var filePaths = Directory.GetFiles(TrainingFilesFolderPath);
+            var filePaths = Directory.GetFiles(TrainingFolder);
             if (n > filePaths.Length)
             {
                 n = filePaths.Length;

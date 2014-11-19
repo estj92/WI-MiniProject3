@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using DataManipulator;
 
 namespace MainProgram
 {
@@ -9,6 +10,9 @@ namespace MainProgram
     {
         static void Main(string[] args)
         {
+            Reader reader = new Reader(@"../../../netflix");
+
+            var files = reader.ReadSeveralTrainingFiles(10);
         }
     }
 }
