@@ -18,11 +18,13 @@ namespace MainProgram
             // using probes and training data:
             // create a new probe file, with <movie, user, score>
 
-            Stopwatch watch = new Stopwatch();
-            watch.Start();
-            reader.CalcAndSaveUsersRatings();
-            watch.Stop();
-            Console.WriteLine(watch.Elapsed);
+            //Stopwatch watch = new Stopwatch();
+            //watch.Start();
+            //reader.CalcAndSaveUsersRatings();
+            //watch.Stop();
+            //Console.WriteLine(watch.Elapsed);
+
+            var calcProbe = reader.ReadUsersRatingsFromCreatedProbeFile();
 
             Console.ReadKey();
 

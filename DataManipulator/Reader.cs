@@ -15,6 +15,9 @@ namespace DataManipulator
         {
             RootFolder = rootFolder;
             TrainingFiles = Directory.GetFiles(TrainingFolder);
+
+            Comma = new char[] { ',' };
+            Colon = new char[] { ':' };
         }
 
         public string RootFolder { get; private set; }
@@ -22,6 +25,9 @@ namespace DataManipulator
         public string TrainingFolder { get { return DataFolder + "/training"; } }
         public string[] TrainingFiles { get; private set; }
         public string CreatedProbeFile { get { return RootFolder + "/createdprobe.txt"; } }
+
+        private char[] Comma { get; set; }
+        private char[] Colon { get; set; }
 
         /// <summary>
         /// Returns [movie, [user, rating]]
@@ -37,13 +43,13 @@ namespace DataManipulator
             {
                 //index = int.Parse(reader.ReadLine().Split(new char[] { ':' })[0]);
                 string first = reader.ReadLine();
-                var val = first.TrimEnd(new char[] { ':' });
+                var val = first.TrimEnd(Colon);
                 index = int.Parse(val);
 
                 while (!reader.EndOfStream)
                 {
                     var line = reader.ReadLine();
-                    var split = line.Split(new char[] { ',' });
+                    var split = line.Split(Comma);
                     int user = int.Parse(split[0]);
                     int rating = int.Parse(split[1]);
 
@@ -109,7 +115,7 @@ namespace DataManipulator
 
                     if (line.Contains(':'))
                     {
-                        var ind = line.TrimEnd(new char[] { ':' });
+                        var ind = line.TrimEnd(Colon);
                         index = int.Parse(ind);
                         probes[index] = new List<int>();
                         line = reader.ReadLine();
@@ -123,10 +129,44 @@ namespace DataManipulator
         }
 
 
-        //public Dictionary<int, List<Tuple<int, int>>> ReadUsersRatingsFromCreatedProbeFile()
-        //{
+        public Dictionary<int, List<Tuple<int, int>>> ReadUsersRatingsFromCreatedProbeFile()
+        {
+            var result = new Dictionary<int, List<Tuple<int, int>>>();
 
-        //}
+            if (!File.Exists(CreatedProbeFile))
+            {
+                throw new FileNotFoundException("The created probe file was not found");
+            }
+
+            using (StreamReader reader = new StreamReader(CreatedProbeFile))
+            {
+                int movie = -1;
+                while (!reader.EndOfStream)
+                {
+                    string line = reader.ReadLine();
+
+                    if (line.EndsWith(":"))
+                    {
+                        movie = int.Parse(line.TrimEnd(Colon));
+                        result.Add(movie, new List<Tuple<int, int>>());
+                    }
+                    else if (line == "")
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        var splitted = line.Split(Comma);
+                        int mov = int.Parse(splitted[0]);
+                        int rating = int.Parse(splitted[1]);
+
+                        result[movie].Add(new Tuple<int, int>(mov, rating));
+                    }
+                }
+            }
+
+            return result;
+        }
 
         public void CalcAndSaveUsersRatings()
         {
@@ -144,7 +184,7 @@ namespace DataManipulator
             }
             using (StreamWriter writer = new StreamWriter(CreatedProbeFile))
             {
-                foreach (var line in output)
+                foreach (var line in output.OrderBy(o => o.Length))
                 {
                     writer.WriteLine(line);
                 }
