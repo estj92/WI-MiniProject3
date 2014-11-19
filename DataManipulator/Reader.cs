@@ -15,13 +15,14 @@ namespace DataManipulator
 
         public string TrainingFilesFolderPath { get; private set; }
 
-        public Dictionary<int, int> ReadTrainingFile(string file)
+        public Tuple<int, Dictionary<int, int>> ReadTrainingFile(string file)
         {
             var values = new Dictionary<int, int>();
+            int index = -1;
 
             using (StreamReader reader = new StreamReader(file))
             {
-                reader.ReadLine();
+                index = int.Parse(reader.ReadLine().Split(new char[] { ':' })[0]);
 
                 while (!reader.EndOfStream)
                 {
@@ -34,9 +35,26 @@ namespace DataManipulator
                 }
             }
 
-            return values;
+            return new Tuple<int, Dictionary<int, int>>(index, values);
         }
 
+        public Dictionary<int, Dictionary<int, int>> ReadSeveralTrainingFiles(int n)
+        {
+            var filePaths = Directory.GetFiles(TrainingFilesFolderPath);
+            if (n > filePaths.Length)
+            {
+                n = filePaths.Length;
+            }
 
+            var values = new Dictionary<int, Dictionary<int, int>>(n);
+
+            for (int i = 0; i < n; i++)
+            {
+                var value = ReadTrainingFile(filePaths[i]);
+                values.Add(value.Item1, value.Item2);
+            }
+
+            return values;
+        }
     }
 }
