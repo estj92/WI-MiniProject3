@@ -35,6 +35,10 @@ namespace MainProgram
             var trainingMovies = trainingFiles.Keys.ToList();
 
 
+            // using probes and training data:
+            // create a new probe file, with <movie, user, score>
+
+
             var movies = reader.ReadMovies();
             //var probes = reader.ReadProbe();
             //var pairs = reader.ProbesToPairs(probes, allUsers);
