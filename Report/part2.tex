@@ -1,1 +1,18 @@
 \section{Learning}
+We have talked about two basic paradigms of recommender system. Which one fits the above data? What would we need to build the other type? 
+
+\subsection{Pre-processing}
+To save processing time, we subtract the user and movie means, ignoring missing entries:
+\[
+    R_{mu} \gets R_{mu} - \frac{1}{U_m}\sum_{s}{R_{ms}} - \frac{1}{M_u}\sum_{r}{R_{ru}} + \frac{1}{N}\sum_{s}\sum_{r}{R_{sr}}
+\]
+where
+\begin{itemize}
+    \item $U_m$: total number of ratings for movie $m$.
+    \item $M_u$: total number of ratings for user $u$.
+    \item $N$: total number of movie-user pairs.
+\end{itemize}
+%
+When doing the predictions, this must be added to the result (replacing + with -, and - with +).
+
+When doing the pre-processing on a limited set (100 movies, with around 100 ratings each), the mean results to very close to 0. We blame the difference on the double datatype.
