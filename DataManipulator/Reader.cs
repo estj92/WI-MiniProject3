@@ -174,7 +174,16 @@ namespace DataManipulator
                 }
             }
 
-            return result;
+
+            var res = new Dictionary<int, List<Tuple<int, int>>>();
+            foreach (var item in result.Reverse().Skip(2000).Take(100))
+            {
+                res.Add(item.Key, item.Value);
+            }
+
+            return res;
+
+            //return x;
         }
 
         public void CalcAndSaveUsersRatings()
@@ -226,6 +235,110 @@ namespace DataManipulator
             }
 
             return movieUsersRatings.ToString();
+        }
+
+        public Dictionary<int, List<Tuple<int, double>>> PreProcessing_2B(Dictionary<int, List<Tuple<int, int>>> input)
+        {
+            // WI_RecSysCF.pdf: 35
+
+            // #ratings per movie
+            var U = new Dictionary<int, int>(input.Count);
+            foreach (var rating in input)
+            {
+                U[rating.Key] = rating.Value.Count;
+            }
+
+            // ratings per user
+            var M = new Dictionary<int, int>();
+            foreach (var movie in input)
+            {
+                foreach (var user in movie.Value)
+                {
+                    if (M.ContainsKey(user.Item1))
+                    {
+                        M[user.Item1]++;
+                    }
+                    else
+                    {
+                        M.Add(user.Item1, 1);
+                    }
+                }
+            }
+
+            int N = input
+                .Select(i => i.Value.Count)
+                .Sum();
+
+            int totalRating = 0;
+            foreach (var rating in input.Values)
+            {
+                totalRating += rating.Select(i => i.Item2).Sum();
+            }
+            double sum3 = (double)1 / N * totalRating;
+
+            int x = 0;
+            var result = new Dictionary<int, List<Tuple<int, double>>>(input.Count);
+            foreach (var movie in input)
+            {
+                var m = movie.Key;
+                result[m] = new List<Tuple<int, double>>();
+
+                if (++x % 10 == 0) { Debug.WriteLine(x); }
+                foreach (var user in movie.Value)
+                {
+
+                    var u = user.Item1;
+
+                    var rmu = input[movie.Key].First(t => t.Item1 == user.Item1).Item2;
+
+                    var sum1 = (double)1 / U[m] * GetSumOfMovieRating(m, input);
+
+                    var sum2 = (double)1 / M[u] * GetSumOfUserRating(u, input);
+
+                    var R = rmu - sum1 - sum2 + sum3;
+
+                    result[m].Add(new Tuple<int, double>(u, R));
+                }
+            }
+
+            int c = 0;
+            double val = 0;
+            foreach (var item in result)
+            {
+                val += item.Value.Select(i => i.Item2).Sum();
+            }
+
+            return result;
+        }
+
+        private Dictionary<int, int> SummedMovieRating = new Dictionary<int, int>();
+        private double GetSumOfMovieRating(int movie, Dictionary<int, List<Tuple<int, int>>> input)
+        {
+            if (!SummedMovieRating.ContainsKey(movie))
+            {
+                SummedMovieRating[movie] = input[movie]
+                    .Select(i => i.Item2)
+                    .Sum();
+            }
+            return SummedMovieRating[movie];
+        }
+
+        private Dictionary<int, int> SummedUserRating = new Dictionary<int, int>();
+        private double GetSumOfUserRating(int user, Dictionary<int, List<Tuple<int, int>>> input)
+        {
+            if (!SummedUserRating.ContainsKey(user))
+            {
+                int total = 0;
+                foreach (var rating in input.Select(i => i.Value))
+                {
+                    var ra = rating.Where(i => i.Item1 == user).Select(i => i.Item2).FirstOrDefault();
+                    total += ra == null ? 0 : ra;
+                }
+
+                SummedUserRating[user] = total;
+            }
+
+            return SummedUserRating[user];
         }
     }
 }

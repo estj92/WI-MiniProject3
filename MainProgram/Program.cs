@@ -13,28 +13,11 @@ namespace MainProgram
         {
             Reader reader = new Reader(@"../../..");
 
-            //var trainingFiles = reader.ReadSeveralTrainingFiles(200000);
-                        
-            // using probes and training data:
-            // create a new probe file, with <movie, user, score>
-
-            //Stopwatch watch = new Stopwatch();
-            //watch.Start();
-            //reader.CalcAndSaveUsersRatings();
-            //watch.Stop();
-            //Console.WriteLine(watch.Elapsed);
-
             var calcProbe = reader.ReadOrCreateUserRatingsFromProbe();
+            reader.PreProcessing_2B(calcProbe);
 
+            Console.WriteLine("DONE");
             Console.ReadKey();
-
-            //var probes = reader.ReadProbeFile();
-
-
-            //var movies = reader.ReadMovies();
-            //var probes = reader.ReadProbe();
-            //var pairs = reader.ProbesToPairs(probes, allUsers);
-            //var pairs = reader.ReadProbesAsPair(trainingMovies, trainingUsers);
         }
 
         private static IEnumerable<int> DistinctUsers(Dictionary<int, Dictionary<int, int>> trainingFiles)
