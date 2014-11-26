@@ -190,3 +190,9 @@ ModelManifest.xml
 
 
 netflix
+
+Report/*.aux
+Report/*.pdf
+Report/*.gz
+Report/*.txss
+Report/*.out
