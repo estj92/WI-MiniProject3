@@ -128,6 +128,15 @@ namespace DataManipulator
             return probes;
         }
 
+        public Dictionary<int, List<Tuple<int, int>>> ReadOrCreateUserRatingsFromProbe()
+        {
+            if (!File.Exists(CreatedProbeFile))
+            {
+                CalcAndSaveUsersRatings();
+            }
+
+            return ReadUsersRatingsFromCreatedProbeFile();
+        }
 
         public Dictionary<int, List<Tuple<int, int>>> ReadUsersRatingsFromCreatedProbeFile()
         {

@@ -24,7 +24,7 @@ namespace MainProgram
             //watch.Stop();
             //Console.WriteLine(watch.Elapsed);
 
-            var calcProbe = reader.ReadUsersRatingsFromCreatedProbeFile();
+            var calcProbe = reader.ReadOrCreateUserRatingsFromProbe();
 
             Console.ReadKey();
 
