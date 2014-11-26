@@ -1,5 +1,29 @@
 \section{Learning}
-We have talked about two basic paradigms of recommender system. Which one fits the above data? What would we need to build the other type? 
+%We have talked about two basic paradigms of recommender system. Which one fits the above data? What would we need to build the other type? 
+The two basic paradigms in recommender systems are Content-based, and collaborative. And hybrid versions. The short version of each is:
+\paragraph{Content based} Selects ``things'' similar what to the user previously liked.
+\paragraph{Collaborative} Select ``things'' the community likes
+\paragraph{Hybrid} Combines different input sources.
+
+Content based, and collaborative filtering will be further described, and the one best fitting this project will be decided.
+
+\subsection{Content based filtering}
+This method needs two things; information about items, and a user profile.
+The item information could be e.g.\ author, genre, \ldots.
+The user profile describes what the user likes, or dislikes, from either implicit or explicit information.
+This makes it an adaptive process, as the user might rate new items, or buy new things, or \ldots.
+
+The content can be anything, from websites, to restaurants. Structured (parts of) content can be represented by a set of attributes, while unstructured content can just be a free-text description.
+
+The basic method for suggest items to the user $U$, from a set of item $I$, is to compute the similarity with an item the user has not seen, combining multiple attributes:
+\[
+    \mathrm{sim}(U, I) = w_1 \mathrm{sim}_{att_1}(U, I) + w_2 \mathrm{sim}_{att_2}(U, I) + \ldots
+\]
+and suggest the most similar items.
+Different attributes are combined, as they might have different similarity measures, or one might be more important than another.
+Comparing unstructured text is as simple as using cosine similarity, as we did in the first miniproject.
+
+\subsection{Collaborative filtering}
 
 \subsection{Pre-processing}
 To save processing time, we subtract the user and movie means, ignoring missing entries:
