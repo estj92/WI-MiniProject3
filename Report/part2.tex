@@ -24,6 +24,14 @@ Different attributes are combined, as they might have different similarity measu
 Comparing unstructured text is as simple as using cosine similarity, as we did in the first miniproject.
 
 \subsection{Collaborative filtering}
+The are two approaches to CF: User-based nearest neighbors, and item-based nearest neighbors ($k$NN).
+Both require a matrix of user-item ratings.
+
+\subsubsection{User-based $k$NN}
+It has a limiting assumption: Users preferences and tastes are stable over time.
+The general approach is to select an item not seen by a user, and estimate the users rating based on like-minded other users.
+
+\subsubsection{Item-based $k$NN}
 
 \subsection{Pre-processing}
 To save processing time, we subtract the user and movie means, ignoring missing entries:
