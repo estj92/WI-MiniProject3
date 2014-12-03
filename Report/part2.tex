@@ -1,11 +1,12 @@
 \section{Learning}
 %We have talked about two basic paradigms of recommender system. Which one fits the above data? What would we need to build the other type? 
 The two basic paradigms in recommender systems are Content-based, and collaborative. And hybrid versions. The short version of each is:
-\paragraph{Content based} Selects ``things'' similar what to the user previously liked.
-\paragraph{Collaborative} Select ``things'' the community likes
+\paragraph{Content based} Selects ``things'' similar what to the user previously liked, by creating profiles for users and items.
+\paragraph{Collaborative} Select ``things'' the community likes, by relying on users past behavior.
 \paragraph{Hybrid} Combines different input sources.
 
-Content based, and collaborative filtering will be further described, and the one best fitting this project will be decided.
+\subsection{Paradigm fitting the Netflix data}
+The best choice for the Netflix data is collaborative filtering, as we know nothing about neither users nor movies, apart from users ratings of movies. To use Content Based Filtering, we would need user profiles, and movie information (directors, actors, genres, \ldots).
 
 \subsection{Content based filtering}
 This method needs two things; information about items, and a user profile.
