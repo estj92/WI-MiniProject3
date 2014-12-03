@@ -31,7 +31,37 @@ Both require a matrix of user-item ratings.
 It has a limiting assumption: Users preferences and tastes are stable over time.
 The general approach is to select an item not seen by a user, and estimate the users rating based on like-minded other users.
 
+To measure user similarity, Pearson Similarity can be used:
+\[
+    \mathrm{sim}(a, b) = \frac{\sum_{p \in P}(r_{a, p} - \bar{r_a})(r_{b, p} - \bar{r_b})}{\sqrt{\sum_{p \in P}(r_{a, p} - \bar{r_a})^2}\sqrt{\sum_{p \in P}(r_{b, p} - \bar{r_b})^2}}
+\]
+where
+\begin{itemize}
+    \item $a, b$: users
+    \item $r_{a, p}$: user $a$'s rating for item $p$
+    \item $\bar{r_a}$: user $a$'s average rating
+    \item $P_a, P_b$: the sets of items users $a$ and $b$ has rated
+    \item $P = P_a \cap P_b$: the items both users $a$ and $b$ has rated
+\end{itemize}
+This makes two like minded users, one being positive, one being negative, agree more.
+
+A common prediction function is:
+\[
+    \mathrm{pred}(a, p) = \bar{r_a} + \sum_{b \in N}w(a, b)(r_{b, p} - \bar{r_b})
+\]
+with the weight function being the normalized similarity:
+\[
+    w(a, b) = \frac{\mathrm{sim}(a, b)}{\sum_{b \in N}\mathrm{sim}(a, b)}
+\]
+A common approach is to use between 50 and 200 positively correlated neighbors.
+
 \subsubsection{Item-based $k$NN}
+
+\subsection{Matrix factorization}
+
+
+\subsubsection{Is Matrix Factorization a better choice for CF for the Netflix data?}
+
 
 \subsection{Pre-processing}
 To save processing time, we subtract the user and movie means, ignoring missing entries:
