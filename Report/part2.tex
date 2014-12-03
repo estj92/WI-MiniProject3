@@ -56,6 +56,20 @@ with the weight function being the normalized similarity:
 A common approach is to use between 50 and 200 positively correlated neighbors.
 
 \subsubsection{Item-based $k$NN}
+This approach uses similarities between items, instead of users, by finding items similar to some item to predict a users rating for it.
+
+The similarity measure could be the Adjusted Cosine Similarity, which takes the average user rating into account.
+\[
+    \mathrm{sim}(p, q) = \frac{\sum_{u \in U}(r_{u, p} - \bar{r_u})(r_{u, q} - \bar{r_u})}{\sqrt{\sum_{u \in U}(r_{u, p} - \bar{r_u})^2}\sqrt{\sum_{u \in U}(r_{u, q} - \bar{r_u})^2}}
+\]
+where $U$ is the set of users who have rated both items $p$ and $q$, and $I$ is the set of items rated by user $a$, and the prediction function is:
+\[
+    \mathrm{pred}(a, p) = \sum_{q \in I}w(p, q)r_{a, q}
+\]
+and the weight function is:
+\[
+    w(p, q) = \frac{\mathrm{sim}(p, q)}{\sum_{q \in N}\mathrm{sim}(p, q)}
+\]
 
 \subsection{Matrix factorization}
 
