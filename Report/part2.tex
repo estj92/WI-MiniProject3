@@ -73,10 +73,12 @@ and the weight function is:
 \]
 
 \subsection{Matrix factorization}
+Using matrix factorization we can easily calculate the probability of a user liking an item. If a user $q_{u}$ is described by a vector where each point describes how a user likes a particular factor, and each movie $m_{i}$ is describes in a similar fashion.  Then we can describe the probability that a user will like a movie, $p$, using the dot product.\\
 
+$ p_{u,m} = m_{i}q{u}$
 
 \subsubsection{Is Matrix Factorization a better choice for CF for the Netflix data?}
-
+Yes because by using matrix factorization in conjunction with SVD, it does not only speed up run time but also, makes it possible to run it on unknown items.
 
 \subsection{Pre-processing}
 To save processing time, we subtract the user and movie means, ignoring missing entries:
